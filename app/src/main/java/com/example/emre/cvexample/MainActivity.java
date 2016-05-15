@@ -33,6 +33,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 import android.app.Activity;
 import android.os.Bundle;
@@ -57,6 +58,7 @@ import android.view.View.OnTouchListener;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.features2d.*;
 import org.opencv.*;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -91,12 +93,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
 
 
     }*/
-
+Button button;
     private static final String TAG = "OCVSample::Activity";
 
     private Tutorial3View mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
-    private MenuItem             mItemSwitchCamera = null;
+
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -105,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
                 case LoaderCallbackInterface.SUCCESS:
                 {
                     Log.i(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
-                    mOpenCvCameraView.setOnTouchListener(MainActivity.this);
+                   // mOpenCvCameraView.enableView();
+                  //  mOpenCvCameraView.setOnTouchListener(MainActivity.this);
                 } break;
                 default:
                 {
@@ -126,17 +128,27 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        button=(Button)findViewById(R.id.btn1);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent i = new Intent(getApplicationContext(), TemplateDemo.class);
+                startActivity(i);
+            }
+        });
+            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
+/*
         mOpenCvCameraView = (Tutorial3View) findViewById(R.id.tutorial1_activity_java_surface_view);
 
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
-
+*/
     }
     @SuppressLint("SimpleDateFormat")
     @Override
