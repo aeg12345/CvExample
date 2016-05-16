@@ -32,9 +32,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity  {
 
-    String oF;
-    String imgf;
-    String tf;
+
     ImageView sonucimg;
 
 
@@ -84,9 +82,7 @@ static {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
          sonucimg = (ImageView) findViewById(R.id.sonucimg);
-         oF="C:/Users/Emre/Downloads/asfasf/CvExample/app/src/main/res/drawable/sonuc2.jpg";
-         imgf= "C:/Users/Emre/Downloads/asfasf/CvExample/app/src/main/res/drawable/img.png";
-         tf="C:/Users/Emre/Downloads/asfasf/CvExample/app/src/main/res/drawable/temp.png";
+
         new MatchingDemo().run(R.drawable.kafam, R.drawable.uzak, R.drawable.sonuc, Imgproc.TM_SQDIFF_NORMED);
 
 
