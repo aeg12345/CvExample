@@ -1,89 +1,46 @@
 package com.example.emre.cvexample;
 import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
+
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.ListIterator;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Mat;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.hardware.Camera.Size;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SubMenu;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.Toast;
-import android.app.Activity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
-import android.view.WindowManager;
-import android.widget.Toast;
-import android.content.Intent;
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.hardware.Camera;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import org.opencv.android.OpenCVLoader;
-import org.opencv.features2d.*;
-import org.opencv.*;
+
+
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
+
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
 
 
-public class MainActivity extends AppCompatActivity implements CvCameraViewListener2,OnTouchListener {
-    @Override
-    public void onCameraViewStarted(int width, int height) {
+public class MainActivity extends AppCompatActivity  {
 
-    }
-
-    @Override
-    public void onCameraViewStopped() {
-
-    }
-
-    @Override
-    public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        return inputFrame.rgba();
-    }
+    String oF;
+    String imgf;
+    String tf;
+    ImageView sonucimg;
 
 
 
-/*static {
+
+static {
         if (!OpenCVLoader.initDebug()){
             Log.i("opencv", "opencv initialzation failed");
         }
@@ -92,12 +49,12 @@ public class MainActivity extends AppCompatActivity implements CvCameraViewListe
         }
 
 
-    }*/
-Button button;
+    }
+
     private static final String TAG = "OCVSample::Activity";
 
-    private Tutorial3View mOpenCvCameraView;
-    private boolean              mIsJavaCamera = true;
+
+
 
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -118,9 +75,6 @@ Button button;
         }
     };
 
-    public void Tutorial1Activity() {
-        Log.i(TAG, "Instantiated new " + this.getClass());
-    }
 
 
 
@@ -129,17 +83,15 @@ Button button;
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        button=(Button)findViewById(R.id.btn1);
+         sonucimg = (ImageView) findViewById(R.id.sonucimg);
+         oF="C:/Users/Emre/Downloads/asfasf/CvExample/app/src/main/res/drawable/sonuc2.jpg";
+         imgf= "C:/Users/Emre/Downloads/asfasf/CvExample/app/src/main/res/drawable/img.png";
+         tf="C:/Users/Emre/Downloads/asfasf/CvExample/app/src/main/res/drawable/temp.png";
+        new MatchingDemo().run(R.drawable.kafam, R.drawable.uzak, R.drawable.sonuc, Imgproc.TM_SQDIFF_NORMED);
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                Intent i = new Intent(getApplicationContext(), TemplateDemo.class);
-                startActivity(i);
-            }
-        });
-            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
+
 
 
 /*
@@ -150,44 +102,81 @@ Button button;
         mOpenCvCameraView.setCvCameraViewListener(this);
 */
     }
-    @SuppressLint("SimpleDateFormat")
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        Log.i(TAG,"onTouch event");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        String currentDateandTime = sdf.format(new Date());
-        String fileName = Environment.getExternalStorageDirectory().getPath() +
-                "/sample_picture_" + currentDateandTime + ".jpg";
-        mOpenCvCameraView.takePicture(fileName);
-        Toast.makeText(this, fileName + " saved", Toast.LENGTH_SHORT).show();
-        return false;
-    }
 
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
-        } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+    public class MatchingDemo {
+        public void run(int inFile, int templateFile, int outFile, int match_method) {
+            System.out.println("\nRunning Template Matching");
+
+            Mat img = new Mat();
+            Mat templ= new Mat();
+
+            System.out.println("\nRead the images");
+            /*templ= Imgcodecs.imread(imgf);
+                img=Imgcodecs.imread(tf);*/
+
+            try {
+                img = Utils.loadResource(getApplicationContext(), R.drawable.uzak, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+                templ = Utils.loadResource(getApplicationContext(), R.drawable.kafam, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("\nRead the images"+templ);
+            System.out.println("\nRead the images"+img);
+
+            // / Create the result matrix
+            int result_cols = img.cols() - templ.cols() + 1;
+            int result_rows = img.rows() - templ.rows() + 1;
+            Mat result = new Mat(result_rows, result_cols, CvType.CV_8UC3);
+            System.out.println("\nRead the columns");
+            System.out.println("\nRead the column"+result_cols);
+            System.out.println("\nRead the rows" + result_rows);
+            // / Do the Matching and Normalize
+            Imgproc.matchTemplate(img, templ, result, match_method);
+
+            //Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1, new Mat());
+            System.out.println("\nMatch template run");
+            System.out.println("\nResult" + result);
+            // / Localizing the best match with minMaxLoc
+            Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
+            System.out.println("\nResult after minmax" + result);
+            Point matchLoc;
+            if (match_method == Imgproc.TM_SQDIFF || match_method == Imgproc.TM_SQDIFF_NORMED) {
+                matchLoc = mmr.minLoc;
+            } else {
+                matchLoc = mmr.maxLoc;
+            }
+            Mat Temp=new Mat(result_rows,result_cols, CvType.CV_8UC3);
+            System.out.println("\nResults temp mat" + Temp);
+            //result.convertTo(Temp, CvType.CV_8UC4);
+            System.out.println("\nResults temp mat" + Temp);
+            //Mat fnl=new Mat(Temp.rows(),Temp.cols(),CvType.CV_8UC1);
+
+            //Imgproc.cvtColor(Temp, fnl,Imgproc.COLOR_BGRA2GRAY,0);
+            //System.out.println("\nFinal temp mat" + fnl);
+            // / Show me what you got
+            Imgproc.rectangle(img, matchLoc, new Point(matchLoc.x + templ.cols(),
+                    matchLoc.y + templ.rows()), new Scalar(0, 255, 0));
+
+            // Save the visualized detection.
+            System.out.println("Writing " + outFile);
+            System.out.println("Writing " + result.channels());
+            System.out.println("\nRead the images"+templ);
+            System.out.println("\nRead the images"+img);
+
+
+            //Imgcodecs.imwrite(oF, result);
+            Bitmap resultBitmap = Bitmap.createBitmap(img.cols(), img.rows(), Bitmap.Config.ARGB_8888);
+
+            Utils.matToBitmap(img,resultBitmap);
+            sonucimg.setImageBitmap(resultBitmap);
         }
     }
 
-    public void onDestroy() {
-        super.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
+
+
+
+
+
 
 }
