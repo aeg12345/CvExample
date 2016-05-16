@@ -19,6 +19,7 @@ import android.util.Log;
 
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfFloat;
@@ -35,10 +36,12 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
-
-
+    Mat img = new Mat();
+    Mat templ = new Mat();
+    Mat img2 = new Mat();
+    Mat img3 = new Mat();
     ImageView sonucimg;
-
+    double max_corr;
 
     static {
         if (!OpenCVLoader.initDebug()) {
@@ -78,8 +81,42 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sonucimg = (ImageView) findViewById(R.id.sonucimg);
+        try {
+            img = Utils.loadResource(getApplicationContext(),R.drawable.ontl2 , Imgcodecs.CV_LOAD_IMAGE_COLOR);
+            templ = Utils.loadResource(getApplicationContext(),R.drawable.ontl1 , Imgcodecs.CV_LOAD_IMAGE_COLOR);
+            img2 = Utils.loadResource(getApplicationContext(),R.drawable.yirmitl , Imgcodecs.CV_LOAD_IMAGE_COLOR);
+            img3=Utils.loadResource(getApplicationContext(),R.drawable.yuztl , Imgcodecs.CV_LOAD_IMAGE_COLOR);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        new MatchingDemo().run(Imgproc.TM_SQDIFF_NORMED);
+        if(correlation(img,templ)>correlation(img2,templ)){
+            if(correlation(img,templ)>correlation(img3,templ)){
+                new MatchingDemo().run(img,templ,Imgproc.TM_SQDIFF_NORMED);
+                Toast.makeText(this, "Gösterilen para değeri 10 Türk Lirası!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
+            else{
+                new MatchingDemo().run(img3,templ,Imgproc.TM_SQDIFF_NORMED);
+                Toast.makeText(this, "Gösterilen para değeri 100 Türk Lirası!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+        else{
+            if(correlation(templ,img2)>correlation(templ,img3)){
+                new MatchingDemo().run(img2,templ,Imgproc.TM_SQDIFF_NORMED);
+                Toast.makeText(this, "Gösterilen para değeri 20 Türk Lirası!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
+            else{
+                new MatchingDemo().run(img3,templ,Imgproc.TM_SQDIFF_NORMED);
+                Toast.makeText(this, "Gösterilen para değeri 100 Türk Lirası!!! ",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+/*
+
+       // new MatchingDemo().run(R.drawable.ontl2,R.drawable.ontl1,Imgproc.TM_SQDIFF_NORMED);//
 
 
 
@@ -96,42 +133,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class MatchingDemo {
-        public void run(int match_method) {
-            System.out.println("\nRunning Template Matching");
 
+
+    public class MatchingDemo {
+        public void run(Mat image,Mat template ,int match_method) {
+            System.out.println("\nRunning Template Matching");
             Mat img = new Mat();
             Mat templ = new Mat();
-
+            img=image;
+            templ=template;
+/*
+            Mat img = new Mat();
+            Mat templ = new Mat();
+            Mat templ2 = new Mat();
+*/
             System.out.println("\nRead the images");
             /*templ= Imgcodecs.imread(imgf);
                 img=Imgcodecs.imread(tf);*/
-
+/*
             try {
-                img = Utils.loadResource(getApplicationContext(), R.drawable.ontl2, Imgcodecs.CV_LOAD_IMAGE_COLOR);
-                templ = Utils.loadResource(getApplicationContext(), R.drawable.ontl1, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+                img = Utils.loadResource(getApplicationContext(),imgid , Imgcodecs.CV_LOAD_IMAGE_COLOR);
+                templ = Utils.loadResource(getApplicationContext(),tempid , Imgcodecs.CV_LOAD_IMAGE_COLOR);
+                templ2 = Utils.loadResource(getApplicationContext(),R.drawable.yirmitl , Imgcodecs.CV_LOAD_IMAGE_COLOR);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            System.out.println("\nRead the images" + templ);
-            System.out.println("\nRead the images" + img);
+            }*/
+            /*System.out.println("\nRead the images" + templ);
+            System.out.println("\nRead the images" + img);*/
 
             // / Create the result matrix
             int result_cols = img.cols() - templ.cols() + 1;
             int result_rows = img.rows() - templ.rows() + 1;
             Mat result = new Mat(result_rows, result_cols, CvType.CV_8UC3);
-            System.out.println("\nRead the columns");
+           /* System.out.println("\nRead the columns");
             System.out.println("\nRead the column" + result_cols);
-            System.out.println("\nRead the rows" + result_rows);
+            System.out.println("\nRead the rows" + result_rows);*/
             // / Do the Matching and Normalize
             Imgproc.matchTemplate(img, templ, result, match_method);
             //Imgproc.matchTemplate(img,templ,result,Imgproc.TM_CCOEFF_NORMED);
             //Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1, new Mat());
-            System.out.println("\nMatch template run");
-            System.out.println("\nResult" + result);
+          /*  System.out.println("\nMatch template run");
+            System.out.println("\nResult" + result);*/
             // / Localizing the best match with minMaxLoc
             Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
-            System.out.println("\nResult after minmax" + result);
+           // System.out.println("\nResult after minmax" + result);
             Point matchLoc;
             if (match_method == Imgproc.TM_SQDIFF || match_method == Imgproc.TM_SQDIFF_NORMED) {
                 matchLoc = mmr.minLoc;
@@ -139,9 +184,9 @@ public class MainActivity extends AppCompatActivity {
                 matchLoc = mmr.maxLoc;
             }
             Mat Temp = new Mat(result_rows, result_cols, CvType.CV_8UC3);
-            System.out.println("\nResults temp mat" + Temp);
+            //System.out.println("\nResults temp mat" + Temp);
             //result.convertTo(Temp, CvType.CV_8UC4);
-            System.out.println("\nResults temp mat" + Temp);
+            //System.out.println("\nResults temp mat" + Temp);
             //Mat fnl=new Mat(Temp.rows(),Temp.cols(),CvType.CV_8UC1);
 
             //Imgproc.cvtColor(Temp, fnl,Imgproc.COLOR_BGRA2GRAY,0);
@@ -153,12 +198,12 @@ public class MainActivity extends AppCompatActivity {
             // Save the visualized detection.
 
 
-            System.out.println("\nRead the images" + templ);
+            /*System.out.println("\nRead the images" + templ);
             System.out.println("\nRead the images" + img);
-            double d= correlation(templ, img);
+           // double d= correlation(templ2, img);
 
-            System.out.println("\nThe correlation of the images" +String.format("%.2f", d) );
-            //Imgcodecs.imwrite(oF, result);
+            System.out.println("\nThe correlation of the images" +String.format("%.5f", d) );*/
+
             Bitmap resultBitmap = Bitmap.createBitmap(img.cols(), img.rows(), Bitmap.Config.ARGB_8888);
 
             Utils.matToBitmap(img, resultBitmap);
@@ -174,15 +219,13 @@ public class MainActivity extends AppCompatActivity {
         Mat hsv_test1=new Mat();
 
 
-        try {
-            src_base = Utils.loadResource(getApplicationContext(), R.drawable.ontl2, Imgcodecs.CV_LOAD_IMAGE_COLOR);
-            src_test1 = Utils.loadResource(getApplicationContext(), R.drawable.ontl1, Imgcodecs.CV_LOAD_IMAGE_COLOR);
+
+            src_base = image_1;
+            src_test1 = image_2;
 
 
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
+
+
         Imgproc.cvtColor(src_base, hsv_base, Imgproc.COLOR_BGR2HSV);
         Imgproc.cvtColor(src_test1, hsv_test1, Imgproc.COLOR_BGR2HSV);
 
